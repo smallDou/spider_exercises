@@ -1,0 +1,2 @@
+NAME = 'name'
+PWD = 'password'
