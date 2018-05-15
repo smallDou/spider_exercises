@@ -1,30 +1,22 @@
 import requests
-from settings import *
+from settings import USERNAME,PASSWORD,User_Agent
 import random
 import os
+from db import RedisClient
 
 class Login(object):
-    def __init__(self,username,password):
-        self.username = username
-        self.password = password
+    def __init__(self,username=USERNAME,password=PASSWORD,user_agent=User_Agent):
         self._data = {
-            'username':self.username,
-            'password':self.password,
+            'username':username,
+            'password':password,
             'savestate':'1',
             'r':'http://weibo.cn/',
             'ec':'0',
             'pagerefer':'',
             'entry':'mweibo',
         }
-        self._user_agents = [
-            'Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 '
-            'Mobile/13B143 Safari/601.1]',
-            'Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) '
-            'Chrome/48.0.2564.23 Mobile Safari/537.36',
-            'Mozilla/5.0 (Linux; Android 5.1.1; Nexus 6 Build/LYZ28E) AppleWebKit/537.36 (KHTML, like Gecko) '
-            'Chrome/48.0.2564.23 Mobile Safari/537.36']
         self._headers = {
-            'User_Agent': random.choice(self._user_agents),
+            'User_Agent': random.choice(user_agent),
             'Referer': 'https://passport.weibo.cn/signin/login?entry=mweibo&res=wel&wm=3349&r=http%3A%2F%2Fm.weibo.cn%2F',
             'Origin': 'https://passport.weibo.cn',
             'Host': 'passport.weibo.cn'
@@ -45,9 +37,11 @@ class Login(object):
         
     def save_cookies(self):
         self.login()
-        #save_to_redis()  考虑设置一个set存储cookie
+        conn = RedisClient()
+        conn.add(self._cookie)
+        #print(self._cookie)
                 
 if __name__ == '__main__':
-    l = Login(USERNAME,PASSWORD)
+    l = Login()
     l.save_cookies()
     
