@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[[source]]
+url = "http://pypi.douban.com/simple"
+verify_ssl = false
+name = "home"
+
+[packages]
+requests = "*"
+pymysql = "*"
+selenium = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "2.7"

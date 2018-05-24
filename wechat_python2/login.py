@@ -1,0 +1,62 @@
+# -*- coding: utf-8 -*- 
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+import time
+from selenium.webdriver.common.keys import Keys
+import json
+from os import path
+import io
+
+from setting import USERNAME,PASSWORD
+
+class Login(object):
+    def __init__(self,username=USERNAME,password=PASSWORD):
+        self._browser = webdriver.Chrome()
+        self._wait = WebDriverWait(self._browser,10)
+
+        self._browser.set_window_size(1400,900)
+
+        self.username = username
+        self.password = password
+        
+        self._cookie = {}
+
+    def login(self):
+        url = 'https://mp.weixin.qq.com/'
+        self._browser.get(url)
+        self._browser.implicitly_wait(3)
+        try:
+            input_username = self._wait.until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "#header > div.banner > div > div > form > div.login_input_panel > div:nth-child(1) > div > span > input")))
+            input_username[0].clear()
+            input_username[0].send_keys(self.username)
+
+            input_password = self._wait.until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "#header > div.banner > div > div > form > div.login_input_panel > div:nth-child(2) > div > span > input")))
+            input_password[0].clear()
+            input_password[0].send_keys(self.password)
+            ##记住我
+            remember_me = self._wait.until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "#header > div.banner > div > div > form > div.login_help_panel > label > i")))
+            remember_me[0].click()
+
+            submit = self._wait.until(
+                EC.presence_of_all_elements_located((By.CSS_SELECTOR, "#header > div.banner > div > div > form > div.login_btn_panel > a")))
+            submit[0].click()
+            time.sleep(12)
+            ##存储cookies到本地
+            self._browser.get(url)
+            for cookie_item in self._browser.get_cookies():
+                self._cookie[cookie_item['name']] = cookie_item['value']
+            cookie_str = json.dumps(self._cookie)
+            with io.open(path.join(path.abspath('.'),'cookie.txt'), 'w+') as f:
+                f.write(cookie_str.decode('utf-8'))
+        except TimeoutException:
+            print("Time Out")
+
+if __name__ == '__main__':
+    l = Login()
+    l.login()

@@ -50,6 +50,5 @@ def wait_input(input,str): #减缓输入速度
 def main():
     login(NAME, PWD)
 
-
 if __name__ == "__main__":
     main()
